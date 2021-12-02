@@ -10,6 +10,7 @@ import { PublicRoute } from "./PublicRoute";
 
 import { JournalScreen } from "../components/journal/JournalScreen";
 import { login } from "../actions/auth";
+import { startLoadingNotes } from "../actions/notes";
 
 
 export const AppRouter = () => {
@@ -20,21 +21,34 @@ export const AppRouter = () => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
 
     useEffect(() => {
+
         const auth = getAuth();
-        onAuthStateChanged(auth, (user) => {
+
+        onAuthStateChanged(auth, async (user) => {
+
             if (user?.uid) {
+
                 dispatch(login(user.uid, user.displayName));
+
                 setIsLoggedIn(true);
+
+                dispatch(startLoadingNotes(user.uid));
+
             } else {
+
                 setIsLoggedIn(false);
+
             }
+
             setChecking(false);
+
         });
+
     }, [dispatch, setChecking, setIsLoggedIn]);
 
     if (checking) {
         return (
-            <h1>Espere...</h1>
+            <h1>Wait...</h1>
         )
     }
 
